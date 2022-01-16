@@ -38,6 +38,7 @@ from subprocess import Popen
 from sys import argv
 from sys import stderr
 from flask import Flask, request
+import json
 
 IS_WINDOWS = True if system() == 'Windows' else False
 JAVA_BIN_PATH = 'java.exe' if IS_WINDOWS else 'java'
@@ -96,8 +97,7 @@ def stanford_ner(filename, absolute_path=None):
             entity_type = split_res[1]
 
             if len(entity_name) > 0 and len(entity_type) > 0:
-                results.append([entity_name.strip(), entity_type.strip()])
-
+                results.append({"entity": entity_name.strip(), "tag": entity_type.strip()})
     return results
 
 
@@ -111,10 +111,12 @@ def ner():
     txtFile.write(text)
     txtFile.close()
 
+    # Run Stanford NER function
     entities = stanford_ner(filename)
-    print('\n'.join(
-        [entity[0].ljust(20) + '\t' + entity[1] for entity in entities]))
-    return str(entities)
+
+    # Convert result to JSON
+    jsonResult = json.dumps(entities)
+    return jsonResult
 
 
 @app.route('/')
@@ -124,4 +126,4 @@ def index():
 
 if __name__ == '__main__':
     # exit(ner(argv))
-    app.run(debug=True)
+    app.run(debug=False)
