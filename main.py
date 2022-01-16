@@ -125,5 +125,4 @@ def index():
 
 
 if __name__ == '__main__':
-    # exit(ner(argv))
     app.run(debug=False)
